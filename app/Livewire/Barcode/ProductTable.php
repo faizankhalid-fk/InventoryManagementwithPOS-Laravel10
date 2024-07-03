@@ -18,6 +18,9 @@ class ProductTable extends Component
         $this->product = '';
         $this->quantity = 0;
         $this->barcodes = [];
+
+        $this->query = '';
+        $this->search_results = collect();
     }
 
     public function render() {
@@ -28,6 +31,7 @@ class ProductTable extends Component
         $this->product = $product;
         $this->quantity = 1;
         $this->barcodes = [];
+        
     }
 
     public function generateBarcodes(Product $product, $quantity) {
@@ -58,5 +62,28 @@ class ProductTable extends Component
 
     public function updatedQuantity() {
         $this->barcodes = [];
+    }
+
+    public function resetQuery() {
+        $this->query = '';
+        $this->search_results = collect();
+    }
+
+    public function selectProduct(Product $product) {
+        $this->product = $product;
+        $this->quantity = 1;
+        $this->barcodes = [];
+        $this->query = '';
+    }
+
+     public function updatedQuery() {
+        if ($this->query) {
+            $this->search_results = Product::where('product_name', 'like', '%' . $this->query . '%')
+                ->orWhere('product_code', 'like', '%' . $this->query . '%')
+                ->take($this->how_many)
+                ->get();
+        } else {
+            $this->search_results = collect();
+        }
     }
 }

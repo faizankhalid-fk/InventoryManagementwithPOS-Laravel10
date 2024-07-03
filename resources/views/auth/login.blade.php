@@ -83,8 +83,8 @@
             </div>
 
             <p class="text-center mt-5 lead">
-                Developed By
-                <a href="https://fahimanzam.netlify.app" class="font-weight-bold text-primary">Fahim Anzam Dip</a>
+                Product by
+                <a href="https://www.shapestechnology.com" class="font-weight-bold text-primary">Shapes Technology</a>
             </p>
         </div>
     </div>

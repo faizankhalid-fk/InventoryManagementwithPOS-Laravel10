@@ -16,14 +16,14 @@ class SettingDatabaseSeeder extends Seeder
     public function run()
     {
         Setting::create([
-            'company_name' => 'Triangle POS',
-            'company_email' => 'company@test.com',
-            'company_phone' => '012345678901',
-            'notification_email' => 'notification@test.com',
+            'company_name' => 'Inventory Recorder',
+            'company_email' => 'info@inventoryrecorder.com',
+            'company_phone' => '+447598210534',
+            'notification_email' => 'info@inventoryrecorder.com',
             'default_currency_id' => 1,
             'default_currency_position' => 'prefix',
-            'footer_text' => 'Triangle Pos © 2021 || Developed by <strong><a target="_blank" href="https://fahimanzam.me">Fahim Anzam</a></strong>',
-            'company_address' => 'Tangail, Bangladesh'
+            'footer_text' => 'Inventory Recorder © 2021 || Product by <strong><a target="_blank" href="https://www.shapestechnology.com">Shapes Technology</a></strong>',
+            'company_address' => '9 Saint James Street, London, UK E17 7PJ'
         ]);
     }
 }

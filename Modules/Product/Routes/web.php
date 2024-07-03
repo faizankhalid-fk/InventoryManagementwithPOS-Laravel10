@@ -13,5 +13,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('products', 'ProductController');
     //Product Category
     Route::resource('product-categories', 'CategoriesController')->except('create', 'show');
+    
+    Route::get('/product/select-by-barcode', [BarcodeController::class, 'selectByBarcode']);
 });
 
