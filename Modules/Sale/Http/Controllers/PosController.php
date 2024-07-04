@@ -99,14 +99,7 @@ class PosController extends Controller
     
         $pdfUrl = route('sales.pos.pdf', ['id' => $sale->id]);
         session()->flash('pdfUrl', $pdfUrl);
-
-       // echo "<script>window.open('".$pdfUrl."', '_blank')</script>";
-
-        //return redirect($pdfUrl);
-
-        //window.open($pdfUrl);
-
-
-        return redirect()->route('sales.index');
+        
+        return redirect()->route('app.pos.index');
     }
 }

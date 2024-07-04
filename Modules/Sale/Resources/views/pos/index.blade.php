@@ -31,6 +31,24 @@
 @endsection
 
 @push('page_scripts')
+
+    @if(session('pdfUrl'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var pdfUrl = @json(session('pdfUrl'));
+            if (pdfUrl) {
+                var iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                iframe.src = pdfUrl;
+                iframe.onload = function() {
+                    iframe.contentWindow.print();
+                };
+                document.body.appendChild(iframe);
+            }
+        });
+    </script>
+    @endif
+
     <script src="{{ asset('js/jquery-mask-money.js') }}"></script>
     <script>
         $(document).ready(function () {
