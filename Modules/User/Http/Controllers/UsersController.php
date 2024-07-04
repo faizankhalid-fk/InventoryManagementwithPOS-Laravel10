@@ -4,6 +4,7 @@ namespace Modules\User\Http\Controllers;
 
 use Modules\User\DataTables\UsersDataTable;
 use App\Models\User;
+use Modules\Setting\Entities\Setting;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -36,30 +37,43 @@ class UsersController extends Controller
             'email'    => 'required|email|max:255|unique:users,email',
             'password' => 'required|string|min:8|max:255|confirmed'
         ]);
+        
+        // Fetch the company settings
+        $company = Setting::first();
 
-        $user = User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
-            'password' => Hash::make($request->password),
-            'is_active' => $request->is_active
-        ]);
+        // Get the total count of users
+        $userCount = User::count();
 
-        $user->assignRole($request->role);
+        // Check if company_user is greater than or equal to the total user count
+        if ($company->company_user <= $userCount) {
+            return back()->withErrors('The number of users exceeds the allowed limit.');
+        }else {
+            
+            $user = User::create([
+                'name'     => $request->name,
+                'email'    => $request->email,
+                'password' => Hash::make($request->password),
+                'is_active' => $request->is_active
+            ]);
+            
+            $user->assignRole($request->role);
 
-        if ($request->has('image')) {
-            $tempFile = Upload::where('folder', $request->image)->first();
+            if ($request->has('image')) {
+                $tempFile = Upload::where('folder', $request->image)->first();
 
-            if ($tempFile) {
-                $user->addMedia(Storage::path('public/temp/' . $request->image . '/' . $tempFile->filename))->toMediaCollection('avatars');
+                if ($tempFile) {
+                    $user->addMedia(Storage::path('public/temp/' . $request->image . '/' . $tempFile->filename))->toMediaCollection('avatars');
 
-                Storage::deleteDirectory('public/temp/' . $request->image);
-                $tempFile->delete();
+                    Storage::deleteDirectory('public/temp/' . $request->image);
+                    $tempFile->delete();
+                }
             }
+
+            toast("User Created & Assigned '$request->role' Role!", 'success');
+
+            return redirect()->route('users.index');
         }
-
-        toast("User Created & Assigned '$request->role' Role!", 'success');
-
-        return redirect()->route('users.index');
+        
     }
 
 

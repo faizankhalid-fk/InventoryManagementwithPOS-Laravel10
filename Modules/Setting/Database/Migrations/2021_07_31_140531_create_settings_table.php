@@ -24,6 +24,7 @@ class CreateSettingsTable extends Migration
             $table->string('notification_email');
             $table->text('footer_text');
             $table->text('company_address');
+            $table->integer('company_users');
             $table->timestamps();
         });
     }
