@@ -14,6 +14,8 @@ use Modules\Sale\Entities\Sale;
 use Modules\Sale\Entities\SaleDetails;
 use Modules\Sale\Entities\SalePayment;
 use Modules\Sale\Http\Requests\StorePosSaleRequest;
+use Illuminate\Support\Facades\Redirect;
+
 
 class PosController extends Controller
 {
@@ -29,9 +31,9 @@ class PosController extends Controller
 
 
     public function store(StorePosSaleRequest $request) {
-        DB::transaction(function () use ($request) {
+        $sale = DB::transaction(function () use ($request) {
             $due_amount = $request->total_amount - $request->paid_amount;
-
+    
             if ($due_amount == $request->total_amount) {
                 $payment_status = 'Unpaid';
             } elseif ($due_amount > 0) {
@@ -39,7 +41,7 @@ class PosController extends Controller
             } else {
                 $payment_status = 'Paid';
             }
-
+    
             $sale = Sale::create([
                 'date' => now()->format('Y-m-d'),
                 'reference' => 'PSL',
@@ -58,7 +60,7 @@ class PosController extends Controller
                 'tax_amount' => Cart::instance('sale')->tax() * 100,
                 'discount_amount' => Cart::instance('sale')->discount() * 100,
             ]);
-
+    
             foreach (Cart::instance('sale')->content() as $cart_item) {
                 SaleDetails::create([
                     'sale_id' => $sale->id,
@@ -73,15 +75,15 @@ class PosController extends Controller
                     'product_discount_type' => $cart_item->options->product_discount_type,
                     'product_tax_amount' => $cart_item->options->product_tax * 100,
                 ]);
-
+    
                 $product = Product::findOrFail($cart_item->id);
                 $product->update([
                     'product_quantity' => $product->product_quantity - $cart_item->qty
                 ]);
             }
-
+    
             Cart::instance('sale')->destroy();
-
+    
             if ($sale->paid_amount > 0) {
                 SalePayment::create([
                     'date' => now()->format('Y-m-d'),
@@ -91,9 +93,19 @@ class PosController extends Controller
                     'payment_method' => $request->payment_method
                 ]);
             }
+    
+            return $sale;
         });
+    
+        $pdfUrl = route('sales.pos.pdf', ['id' => $sale->id]);
+        session()->flash('pdfUrl', $pdfUrl);
 
-        toast('POS Sale Created!', 'success');
+       // echo "<script>window.open('".$pdfUrl."', '_blank')</script>";
+
+        //return redirect($pdfUrl);
+
+        //window.open($pdfUrl);
+
 
         return redirect()->route('sales.index');
     }
